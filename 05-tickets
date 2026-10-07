@@ -1,0 +1,24 @@
+Beide Tickets liegen mir schon vor – du hast zwei Screenshots geschickt, die zweite Aufgabe ist also bereits da.
+Sind das zwei verschiedene Aufgaben?
+Technisch verwandt, fachlich verschieden. Beide drehen sich um dieselbe Grundfrage: Auf welchem Cluster darf eine neue VM landen? Der Unterschied liegt im Auslöser:
+Ticket 1 (Storage 90 %) – dynamische Sperre. Der Cluster ist heute erlaubt und morgen nicht mehr, weil sich ein Messwert ändert.
+Ticket 2 (RHEL/Lizenzen) – statische Sperre. Eine feste Zuordnung „Service X darf nur auf Cluster A, B“, die sich nur ändert, wenn jemand die Lizenzlage ändert.
+Sie greifen vermutlich an derselben Stelle in Morpheus an (der Auswahl von Cloud/Resource Pool beim Provisionieren), sind aber getrennt umzusetzen und getrennt zu testen. Ich würde sie nicht zusammenlegen.
+Die Begriffe
+CMP = Cloud Management Platform. Eine Oberfläche, über die man VMs in verschiedenen Virtualisierungsumgebungen (vSphere, Nutanix, Azure …) bereitstellt und verwaltet. Morpheus ist so ein CMP.
+Cluster = hier im Sinne der darunterliegenden Virtualisierung (z. B. ein vSphere-Cluster aus mehreren Hosts mit gemeinsamem Storage). Nicht zu verwechseln mit „Kubernetes-Cluster“ – Morpheus nutzt das Wort leider für beides.
+Provisionierung / Deployment = das Anlegen einer neuen VM.
+Workload = alles, was auf dem Cluster läuft. In deinem Kontext praktisch synonym mit VM.
+Resource Pool = eine logische Unterteilung der Rechenkapazität innerhalb eines Clusters. Morpheus bildet Cluster oft als Resource Pools ab – deshalb taucht der Begriff in Ticket 2 auf: Es soll verhindert werden, dass jemand die Cluster-Sperre umgeht, indem er direkt einen Resource Pool darunter auswählt.
+Cloud (in Morpheus) = eine angebundene Zielumgebung, z. B. ein vCenter.
+Group = eine Bündelung von Clouds, an der Berechtigungen hängen.
+RBAC = Rollenbasierte Rechtevergabe. „Die bestehende Group-/RBAC-Struktur bleibt unverändert“ heißt: Löse die Aufgabe nicht, indem du Leuten Rechte wegnimmst.
+Akzeptanzkriterien = die Checkliste, an der das Ticket als „fertig“ gemessen wird.
+Was ich wirklich weiß – und was nicht
+Ehrlich eingeordnet:
+Konzeptionell solide: Ich kenne das Objektmodell von Morpheus (Clouds, Groups, Resource Pools, Service Plans, Instance Types/Layouts, Policies, Tasks/Workflows) und kann dir plausible Lösungswege herleiten und mit dir die Tickets durcharbeiten.
+Nicht verlässlich: Exakte Klickpfade und Menübezeichnungen der aktuellen Version. Morpheus gehört seit 2024 zu HPE und wurde umbenannt/umstrukturiert; Menüs haben sich zwischen Versionen verschoben. Mein Wissensstand endet im Mai 2026. Ich würde dir also Pfade nennen, die vielleicht stimmen – und das ist für dich als Einsteiger schlechter als gar keine Anleitung, weil du den Fehler nicht erkennen kannst.
+Eine echte Klickanleitung ist möglich, aber nur so: Ich gleiche die Schritte vorher gegen die offizielle HPE-Morpheus-Dokumentation deiner Version ab, oder du schickst mir Screenshots aus deiner Testumgebung und wir gehen gemeinsam durch die Oberfläche. Aus dem Gedächtnis heraus würde ich es nicht tun.
+Eine fachliche Vermutung vorab, ausdrücklich als Hypothese: Für Ticket 2 gibt es vermutlich Bordmittel (Zugriffssteuerung auf Resource-Pool-Ebene, ggf. kombiniert mit dedizierten Instance Types/Layouts). Für Ticket 1 vermute ich, dass es keinen fertigen Schalter „Sperre ab 90 % Storage“ gibt und du Automatisierung brauchst – etwa einen regelmäßigen Task, der die Auslastung abfragt und den Cluster deaktiviert, oder eine Prüfung im Provisioning-Workflow. Das müsste ich aber verifizieren.
+Noch eine Beobachtung: Ticket 2 ist mit 1 Story Point bewertet. Bei neun Akzeptanzkriterien inklusive Umgehungsschutz und Dokumentation wirkt das deutlich zu niedrig – das würde ich im Team ansprechen.
+Wie möchtest du weitermachen: Soll ich zuerst die offizielle Dokumentation durchsuchen und dir verifizierte Lösungswege bringen, oder willst du lieber erst Ticket für Ticket inhaltlich durchsprechen, bis du sicher bist, was da eigentlich gefordert wird? Und weißt du, welche Morpheus-Version bei euch läuft?
